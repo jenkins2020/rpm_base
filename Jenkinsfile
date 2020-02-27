@@ -7,15 +7,19 @@ pipeline {
     }
 
     stages {
+        stage('Cleanup') {
+            when { fileExists('~/rpmbuild') }
+            steps {
+                dir('~/rpmbuild') { deleteDir }
+            }
+        }
         stage('Init') {
             steps {
-                dir("${env.HOME}") {
-                    sh('rpmdev-setuptree')
-                }
-                dir("${env.HOME}/rpmbuild/SOURCES") {
+                sh('rpmdev-setuptree')
+                dir('~/rpmbuild/SOURCES') {
                     sh('wget http://ftp.gnu.org/gnu/hello/hello-2.10.tar.gz')
                 }
-                dir("${env.HOME}/rpmbuild/SPECS") {
+                dir('~/rpmbuild/SPECS') {
                     sh('rpmdev-newspec hello')
                     archiveArtifacts(artifacts: '*.spec')
                     sh("cp ${env.WORKSPACE}/hello.spec .")
@@ -25,7 +29,7 @@ pipeline {
         }
         stage('Build') {
             steps {
-                dir("${env.HOME}/rpmbuild/SPECS") {
+                dir('~/rpmbuild/SPECS') {
                     sh('rpmbuild -ba hello.spec')
                 }
             }

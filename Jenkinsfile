@@ -6,6 +6,10 @@ pipeline {
         }
     }
 
+    environment {
+        MYHOME = '/home/user'
+    }
+
     stages {
         stage('Cleanup') {
             when { expression { fileExists('~/rpmbuild') } }
@@ -16,10 +20,10 @@ pipeline {
         stage('Init') {
             steps {
                 sh('rpmdev-setuptree')
-                dir("${env.HOME}/rpmbuild/SOURCES") {
+                dir("${MYHOME}/rpmbuild/SOURCES") {
                     sh('wget http://ftp.gnu.org/gnu/hello/hello-2.10.tar.gz')
                 }
-                dir("${env.HOME}/rpmbuild/SPECS") {
+                dir("${MYHOME}/rpmbuild/SPECS") {
                     sh('rpmdev-newspec hello')
                     archiveArtifacts(artifacts: '*.spec')
                     sh("cp ${env.WORKSPACE}/hello.spec .")
@@ -29,7 +33,7 @@ pipeline {
         }
         stage('Build') {
             steps {
-                dir("${env.HOME}/rpmbuild/SPECS") {
+                dir("${MYHOME}/rpmbuild/SPECS") {
                     sh('rpmbuild -ba hello.spec')
                 }
             }

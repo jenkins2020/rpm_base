@@ -16,10 +16,10 @@ pipeline {
         stage('Init') {
             steps {
                 sh('rpmdev-setuptree')
-                dir('~/rpmbuild/SOURCES') {
+                dir("${env.HOME}/rpmbuild/SOURCES") {
                     sh('wget http://ftp.gnu.org/gnu/hello/hello-2.10.tar.gz')
                 }
-                dir('~/rpmbuild/SPECS') {
+                dir("${env.HOME}/rpmbuild/SPECS") {
                     sh('rpmdev-newspec hello')
                     archiveArtifacts(artifacts: '*.spec')
                     sh("cp ${env.WORKSPACE}/hello.spec .")
@@ -29,7 +29,7 @@ pipeline {
         }
         stage('Build') {
             steps {
-                dir('~/rpmbuild/SPECS') {
+                dir("${env.HOME}/rpmbuild/SPECS") {
                     sh('rpmbuild -ba hello.spec')
                 }
             }

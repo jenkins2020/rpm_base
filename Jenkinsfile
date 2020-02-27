@@ -1,3 +1,4 @@
+#!/bin/groovy
 pipeline {
     agent {
         dockerfile {
@@ -15,8 +16,16 @@ pipeline {
                 dir('~/rpmbuild/SPECS') {
                     sh('rpmdev-newspec hello')
                     archiveArtifacts(artifacts: '*.spec')
+                    sh("cp ${env.WORKSPACE}/hello.spec .")
                 }
-                sh('ls -R /')
+                //sh('ls -R / || true')
+            }
+        }
+        stage('Build') {
+            steps {
+                dir('~/rpmbuild/SPECS') {
+                    sh('rpmbuild -ba hello.spec')
+                }
             }
         }
     }

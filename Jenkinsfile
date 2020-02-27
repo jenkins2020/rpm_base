@@ -19,16 +19,23 @@ pipeline {
         }
         stage('Init') {
             steps {
+                dir("${MYHOME}") {
+                    echo "yes, accessible"
+                }
+                sh("touch  ${MYHOME}/myfile")
+                sh("ls -R ${MYHOME} ${env.WORKSPACE} || true")
                 sh('rpmdev-setuptree')
-                dir("${MYHOME}/rpmbuild/SOURCES") {
-                    sh('wget http://ftp.gnu.org/gnu/hello/hello-2.10.tar.gz')
+                //sh("cd ${MYHOME}/rpmbuild/SOURCES; wget http://ftp.gnu.org/gnu/hello/hello-2.10.tar.gz")
+                dir("${MYHOME}") {
+                    dir ('rpmbuild/SOURCES/') {
+                        sh('wget http://ftp.gnu.org/gnu/hello/hello-2.10.tar.gz')
+                    }
+                    dir('rpmbuild/SPECS/') {
+                        sh('rpmdev-newspec hello')
+                        archiveArtifacts(artifacts: '*.spec')
+                        sh("cp ${env.WORKSPACE}/hello.spec .")
+                    }
                 }
-                dir("${MYHOME}/rpmbuild/SPECS") {
-                    sh('rpmdev-newspec hello')
-                    archiveArtifacts(artifacts: '*.spec')
-                    sh("cp ${env.WORKSPACE}/hello.spec .")
-                }
-                //sh('ls -R / || true')
             }
         }
         stage('Build') {

@@ -8,9 +8,9 @@ pipeline {
 
     stages {
         stage('Cleanup') {
-            when { fileExists('~/rpmbuild') }
+            when { expression { fileExists('~/rpmbuild') } }
             steps {
-                dir('~/rpmbuild') { deleteDir }
+                dir('~/rpmbuild') { deleteDir() }
             }
         }
         stage('Init') {
